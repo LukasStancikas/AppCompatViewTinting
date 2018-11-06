@@ -3,8 +3,6 @@ Setting a dynamic background to a View, either a Ripple if possible, or lighter 
 
 
 
-
-
     fun View.setRippleBackground(
         backgroundColor: Int,
         radius: Float,
@@ -45,16 +43,11 @@ Setting a dynamic background to a View, either a Ripple if possible, or lighter 
                 background = RippleDrawable(color, drawable, drawable)
             }
         } else {
-            drawable.setColor(backgroundColor)
-            val pressedColor = Color.argb(
-                Color.alpha(backgroundColor),
-                (Color.red(backgroundColor) * 1.4f).roundToInt(),
-                (Color.green(backgroundColor) * 1.4f).roundToInt(),
-                (Color.blue(backgroundColor) * 1.4f).roundToInt()
-            )
-            val colorsStateList = getPressedStateList(backgroundColor,pressedColor)
+            //        drawable.setColor(backgroundColor)
+            val pressedColor = manipulateColor(backgroundColor, 1.15f)
+            val colorsStateList = getPressedStateList(backgroundColor, pressedColor)
             val wrapper = DrawableCompat.wrap(drawable)
-            DrawableCompat.setTintList(wrapper,colorsStateList)
+            DrawableCompat.setTintList(wrapper, colorsStateList)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 background = wrapper
@@ -62,6 +55,19 @@ Setting a dynamic background to a View, either a Ripple if possible, or lighter 
                 setBackgroundDrawable(wrapper)
             }
         }
+    }
+
+    fun manipulateColor(color: Int, factor: Float): Int {
+        val a = Color.alpha(color)
+        val r = Math.round(Color.red(color) * factor)
+        val g = Math.round(Color.green(color) * factor)
+        val b = Math.round(Color.blue(color) * factor)
+        return Color.argb(
+            a,
+            Math.min(r, 255),
+            Math.min(g, 255),
+            Math.min(b, 255)
+        )
     }
 
     fun getPressedStateList(backgroundColor: Int, pressedColor: Int): ColorStateList {
